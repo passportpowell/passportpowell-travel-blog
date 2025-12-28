@@ -8,8 +8,8 @@ import mimetypes
 try:
     from pillow_heif import register_heif_opener
     register_heif_opener()
-except Exception as e:
-    st.warning(f"HEIC support unavailable: {e}")
+except Exception:
+    pass  # HEIC support will be unavailable, but don't break the app
 
 st.set_option("client.showErrorDetails", False)
 
@@ -105,6 +105,128 @@ def to_data_uri(img_path: Path) -> str | None:
         return None
 
 
+def get_city_info(album_name: str) -> dict | None:
+    """Extract city name and return fun facts."""
+    city_facts = {
+        "lima": {
+            "name": "Lima",
+            "country": "Peru",
+            "tagline": "The City of Kings",
+            "facts": [
+                "Founded in 1535 by Spanish conquistador Francisco Pizarro",
+                "Home to the largest fountain complex in the world (Parque de la Reserva)",
+                "Lima's historic center is a UNESCO World Heritage Site",
+                "Known as the gastronomic capital of South America"
+            ]
+        },
+        "cusco": {
+            "name": "Cusco",
+            "country": "Peru",
+            "tagline": "The Historic Capital of the Inca Empire",
+            "facts": [
+                "Once the capital of the Inca Empire, the largest empire in pre-Columbian America",
+                "Sits at 11,152 feet (3,399m) above sea level",
+                "The city's name means 'navel of the world' in Quechua",
+                "Gateway to Machu Picchu, one of the New Seven Wonders of the World"
+            ]
+        },
+        "chiang mai": {
+            "name": "Chiang Mai",
+            "country": "Thailand",
+            "tagline": "The Rose of the North",
+            "facts": [
+                "Founded in 1296 as the capital of the Lanna Kingdom",
+                "Home to over 300 Buddhist temples",
+                "Famous for its annual Yi Peng Lantern Festival",
+                "Digital nomad hub with a thriving expat community"
+            ]
+        },
+        "hua hin": {
+            "name": "Hua Hin",
+            "country": "Thailand",
+            "tagline": "Thailand's Original Beach Resort",
+            "facts": [
+                "Thailand's first beach resort, dating back to the 1920s",
+                "Home to the royal summer palace, Klai Kangwon",
+                "Famous for its night markets and fresh seafood",
+                "One of the few places in Thailand where you can see wild elephants"
+            ]
+        },
+        "bangkok": {
+            "name": "Bangkok",
+            "country": "Thailand",
+            "tagline": "The City of Angels",
+            "facts": [
+                "Official name has 169 characters, the longest city name in the world",
+                "Home to the Grand Palace and over 400 Buddhist temples",
+                "Known as the 'Venice of the East' for its extensive canal network",
+                "One of the world's top tourist destinations"
+            ]
+        },
+        "phuket": {
+            "name": "Phuket",
+            "country": "Thailand",
+            "tagline": "The Pearl of the Andaman",
+            "facts": [
+                "Thailand's largest island",
+                "Famous for its stunning beaches and vibrant nightlife",
+                "Home to the Big Buddha, a 45-meter tall marble statue",
+                "Major center for diving and water sports"
+            ]
+        },
+        "tokyo": {
+            "name": "Tokyo",
+            "country": "Japan",
+            "tagline": "Where Tradition Meets Innovation",
+            "facts": [
+                "World's most populous metropolitan area with over 37 million people",
+                "Home to the world's busiest train station (Shinjuku)",
+                "Has more Michelin-starred restaurants than any other city",
+                "Hosted the Summer Olympics in 1964 and 2021"
+            ]
+        },
+        "paris": {
+            "name": "Paris",
+            "country": "France",
+            "tagline": "The City of Light",
+            "facts": [
+                "Most visited city in the world",
+                "The Eiffel Tower was originally intended to be temporary",
+                "Home to the world's largest art museum, the Louvre",
+                "Has over 400 parks and gardens"
+            ]
+        },
+        "london": {
+            "name": "London",
+            "country": "United Kingdom",
+            "tagline": "A City of Historic Grandeur",
+            "facts": [
+                "Founded by the Romans nearly 2,000 years ago",
+                "The London Underground is the world's oldest underground railway",
+                "Over 300 languages are spoken in the city",
+                "Home to 4 UNESCO World Heritage Sites"
+            ]
+        },
+        "new york": {
+            "name": "New York City",
+            "country": "USA",
+            "tagline": "The City That Never Sleeps",
+            "facts": [
+                "Home to the Statue of Liberty, a gift from France in 1886",
+                "Over 800 languages are spoken, making it the most linguistically diverse city",
+                "Central Park is larger than the principality of Monaco",
+                "The city has appeared in over 250 movies per year"
+            ]
+        }
+    }
+    
+    album_lower = album_name.lower()
+    for key, info in city_facts.items():
+        if key in album_lower:
+            return info
+    return None
+
+
 @st.cache_data(show_spinner=False)
 def collect_albums(root: Path):
     """Collect any folder (at any depth) under root that contains supported images."""
@@ -187,6 +309,18 @@ def render_spotlight(albums):
     data = albums[selected]
     files = data["images"]
     desc = data.get("description", "")
+    
+    # Show city information if available
+    city_info = get_city_info(selected)
+    if city_info:
+        st.markdown(f"### 🌍 {city_info['name']}, {city_info['country']}")
+        st.markdown(f"*{city_info['tagline']}*")
+        
+        with st.expander("✨ Fun Facts", expanded=True):
+            for fact in city_info['facts']:
+                st.markdown(f"• {fact}")
+        st.markdown("")
+    
     if desc:
         st.markdown(desc)
     
@@ -216,7 +350,8 @@ def render_spotlight(albums):
                 img = Image.open(img_path)
                 st.image(img, use_container_width=True)
             except Exception as e:
-                st.error(f"⚠️ Could not load: {img_path.name}\n\nError: {str(e)}")
+                rel_path = img_path.relative_to(IMAGES_ROOT) if img_path.is_relative_to(IMAGES_ROOT) else img_path
+                st.error(f"⚠️ Could not load: {rel_path}")
                 continue
 
 
@@ -256,7 +391,8 @@ def render_all_photos(albums):
                 img = Image.open(img_path)
                 st.image(img, use_container_width=True)
             except Exception as e:
-                st.error(f"⚠️ Could not load: {img_path.name}\n\nError: {str(e)}")
+                rel_path = img_path.relative_to(IMAGES_ROOT) if img_path.is_relative_to(IMAGES_ROOT) else img_path
+                st.error(f"⚠️ Could not load: {rel_path}")
                 continue
 
 
