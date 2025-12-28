@@ -154,9 +154,10 @@ def album_cards(albums):
                     st.markdown(f"<img class='cover-img' src='{data_uri}' />", unsafe_allow_html=True)
                 else:
                     try:
-                        st.image(Image.open(cover), use_container_width=True)
+                        img = Image.open(cover)
+                        st.image(img, use_container_width=True)
                     except Exception:
-                        st.image(str(cover))
+                        st.markdown("<div style='height:220px;background:#f5f5f5;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#999;'>⚠️ Image unavailable</div>", unsafe_allow_html=True)
                 st.markdown(f"**{name}**")
                 if desc:
                     st.caption(desc.split("\n", 1)[0][:160])
@@ -212,9 +213,11 @@ def render_spotlight(albums):
         seen.add(img_path)
         with cols[i % 3]:
             try:
-                st.image(Image.open(img_path), use_container_width=True)
-            except Exception:
-                st.image(str(img_path))
+                img = Image.open(img_path)
+                st.image(img, use_container_width=True)
+            except Exception as e:
+                st.warning(f"⚠️ Could not load: {img_path.name}")
+                continue
 
 
 def render_all_photos(albums):
@@ -250,9 +253,11 @@ def render_all_photos(albums):
     for i, img_path in enumerate(view):
         with cols[i % 3]:
             try:
-                st.image(Image.open(img_path), use_container_width=True)
+                img = Image.open(img_path)
+                st.image(img, use_container_width=True)
             except Exception:
-                st.image(str(img_path))
+                st.warning(f"⚠️ Could not load: {img_path.name}")
+                continue
 
 
 albums = collect_albums(IMAGES_ROOT)
