@@ -4,14 +4,14 @@ from PIL import Image
 import base64
 import mimetypes
 
-st.set_option("client.showErrorDetails", False)
-
-# Try to enable HEIC support
+# Enable HEIC support BEFORE setting page config
 try:
     from pillow_heif import register_heif_opener
     register_heif_opener()
-except Exception:
-    pass
+except Exception as e:
+    st.warning(f"HEIC support unavailable: {e}")
+
+st.set_option("client.showErrorDetails", False)
 
 st.set_page_config(page_title="Trips — Passport Powell", page_icon="🧭", layout="wide")
 st.title("Trips")
@@ -216,7 +216,7 @@ def render_spotlight(albums):
                 img = Image.open(img_path)
                 st.image(img, use_container_width=True)
             except Exception as e:
-                st.warning(f"⚠️ Could not load: {img_path.name}")
+                st.error(f"⚠️ Could not load: {img_path.name}\n\nError: {str(e)}")
                 continue
 
 
@@ -255,8 +255,8 @@ def render_all_photos(albums):
             try:
                 img = Image.open(img_path)
                 st.image(img, use_container_width=True)
-            except Exception:
-                st.warning(f"⚠️ Could not load: {img_path.name}")
+            except Exception as e:
+                st.error(f"⚠️ Could not load: {img_path.name}\n\nError: {str(e)}")
                 continue
 
 
