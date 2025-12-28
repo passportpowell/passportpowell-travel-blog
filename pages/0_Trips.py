@@ -135,7 +135,7 @@ def album_cards(albums):
     
     # Track how many albums to display (load more incrementally)
     if "albums_to_show" not in st.session_state:
-        st.session_state["albums_to_show"] = 12
+        st.session_state["albums_to_show"] = 6
     
     display_names = names[:st.session_state["albums_to_show"]]
 
@@ -175,7 +175,7 @@ def album_cards(albums):
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("📁 Load More Albums", use_container_width=True):
-                st.session_state["albums_to_show"] += 12
+                st.session_state["albums_to_show"] += 6
                 st.rerun()
 
 
@@ -265,10 +265,6 @@ albums = collect_albums(IMAGES_ROOT)
 if not albums:
     st.info("Add trip folders under assets/images (e.g., assets/images/Chiang Mai 2024/) with photos inside.")
 else:
-    ordered_names = [name for name, _ in sorted(albums.items(), key=lambda item: item[1].get("sort_key", item[0]), reverse=True)]
-    if "selected_album" not in st.session_state and ordered_names:
-        st.session_state["selected_album"] = ordered_names[0]
-
     tab_albums, tab_all = st.tabs(["Albums", "All Photos"])
 
     with tab_albums:
