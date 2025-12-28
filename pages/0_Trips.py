@@ -132,16 +132,24 @@ def collect_albums(root: Path):
 
 def album_cards(albums):
     names = [name for name, _ in sorted(albums.items(), key=lambda item: item[1].get("sort_key", item[0]), reverse=True)]
-    # Limit initial render for speed; allow user to expand
-    show_all = st.checkbox("Show all albums", value=st.session_state.get("show_all_albums", False))
-    st.session_state["show_all_albums"] = show_all
-    if not show_all:
-        names = names[:12]
+    
+    # Track how many albums to display (load more incrementally)
+    if "albums_to_show" not in st.session_state:
+        st.session_state["albums_to_show"] = 12
+    
+    if len(names) > st.session_state["albums_to_show"]:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("📁 Load More Albums", use_container_width=True):
+                st.session_state["albums_to_show"] += 12
+                st.rerun()
+    
+    display_names = names[:st.session_state["albums_to_show"]]
 
     cols_per_row = 3
-    for i in range(0, len(names), cols_per_row):
+    for i in range(0, len(display_names), cols_per_row):
         row = st.columns(cols_per_row)
-        for col, name in zip(row, names[i : i + cols_per_row]):
+        for col, name in zip(row, display_names[i : i + cols_per_row]):
             data = albums[name]
             imgs = data["images"]
             cover = imgs[0]
@@ -164,6 +172,10 @@ def album_cards(albums):
                     st.session_state["selected_album"] = name
                     st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Show progress at the bottom
+    if display_names:
+        st.caption(f"Showing {len(display_names)} of {len(names)} albums")
 
 
 def render_spotlight(albums):
