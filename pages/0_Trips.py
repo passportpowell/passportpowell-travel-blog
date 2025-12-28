@@ -137,13 +137,6 @@ def album_cards(albums):
     if "albums_to_show" not in st.session_state:
         st.session_state["albums_to_show"] = 12
     
-    if len(names) > st.session_state["albums_to_show"]:
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            if st.button("📁 Load More Albums", use_container_width=True):
-                st.session_state["albums_to_show"] += 12
-                st.rerun()
-    
     display_names = names[:st.session_state["albums_to_show"]]
 
     cols_per_row = 3
@@ -173,23 +166,34 @@ def album_cards(albums):
                     st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
     
-    # Show progress at the bottom
+    # Show progress and load more button at the bottom
     if display_names:
         st.caption(f"Showing {len(display_names)} of {len(names)} albums")
+    
+    if len(names) > st.session_state["albums_to_show"]:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("📁 Load More Albums", use_container_width=True):
+                st.session_state["albums_to_show"] += 12
+                st.rerun()
 
 
 def render_spotlight(albums):
     selected = st.session_state.get("selected_album")
     if not selected or selected not in albums:
-        st.info("Select an album card above to view it here.")
         return
-    st.divider()
-    st.subheader(f"Album: {selected}")
+    st.subheader(f"📸 {selected}")
     data = albums[selected]
     files = data["images"]
     desc = data.get("description", "")
     if desc:
         st.markdown(desc)
+    
+    if st.button("← Back to Albums", key="back-to-albums"):
+        st.session_state.pop("selected_album", None)
+        st.rerun()
+    
+    st.divider()
 
     page_size = st.slider("Photos per page", 9, 48, 18, step=3, key="spot-pagesize")
     total = len(files)
@@ -263,8 +267,14 @@ else:
     tab_albums, tab_all = st.tabs(["Albums", "All Photos"])
 
     with tab_albums:
+        # Show selected album at the top if one is selected
+        if st.session_state.get("selected_album"):
+            render_spotlight(albums)
+        else:
+            st.info("👇 Browse albums below and click 'View album' to see photos")
+        
+        st.divider()
         album_cards(albums)
-        render_spotlight(albums)
 
     with tab_all:
         render_all_photos(albums)
