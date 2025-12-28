@@ -162,7 +162,7 @@ def album_cards(albums):
                 st.markdown(f"<div class='trip-meta'>{len(imgs)} photos</div>", unsafe_allow_html=True)
                 if st.button("View album", key=f"spot-{name}"):
                     st.session_state["selected_album"] = name
-                    st.switch_page("Album")
+                    st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
 
 
@@ -216,7 +216,12 @@ def render_all_photos(albums):
         st.info("No photos found in assets/images.")
         return
 
-    page_size = st.slider("Photos per page", 12, 60, 36, step=6, key="all-pagesize")
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        page_size = st.slider("Photos per page", 12, 60, 24, step=6, key="all-pagesize")
+    with col2:
+        st.metric("Total photos", len(files))
+    
     total = len(files)
     pages = (total + page_size - 1) // page_size or 1
     page = st.number_input("Page", 1, pages, 1, key="all-page")
