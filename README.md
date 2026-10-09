@@ -4,7 +4,6 @@
 
 [![Streamlit](https://img.shields.io/badge/Built%20with-Streamlit-FF4B4B?logo=streamlit)](https://streamlit.io)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ##  Features
 
@@ -14,6 +13,8 @@
 -  **Responsive Design**  Beautiful cards with hover effects and mobile-friendly layout
 -  **HEIC Support**  Display iPhone HEIC photos natively
 -  **Performance Optimized**  Lazy loading and caching for fast page loads
+
+No license file is included in this repository.
 
 ##  Quick Start
 
