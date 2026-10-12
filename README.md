@@ -1,6 +1,6 @@
 ﻿#  Passport Powell  Travel Blog
 
-> A beautiful Streamlit-powered travel blog to share your adventures, photos, and videos from around the world.
+> A Streamlit prototype for browsing travel photo albums and embedded videos. This repository is separate from the current passportpowell.com website.
 
 [![Streamlit](https://img.shields.io/badge/Built%20with-Streamlit-FF4B4B?logo=streamlit)](https://streamlit.io)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org)
@@ -12,9 +12,17 @@
 -  **City Information**  Automatic city facts and descriptions for major destinations
 -  **Responsive Design**  Beautiful cards with hover effects and mobile-friendly layout
 -  **HEIC Support**  Display iPhone HEIC photos natively
--  **Performance Optimized**  Lazy loading and caching for fast page loads
+-  **Progressive browsing**  Album pages load in batches; performance depends on the image collection and host.
 
-No license file is included in this repository.
+No license file is included in this repository. Public source availability does not imply permission to reuse the code or photographs.
+
+## Current scope and review
+
+On 12 October 2026, a bounded local review opened the home page, album browser and a representative album. The repository does not have a verified public deployment. This is a personal/local prototype, not an authenticated publishing service.
+
+The Videos and Links pages expose configuration editing without a login boundary. Do not deploy those editing controls publicly without adding authentication or separating a read-only public view. No configuration writes were performed during the review. HEIC decoding requires the optional pillow-heif installation; it was not verified in this review.
+
+For the owner's current public travel website, see [passportpowell.com](https://www.passportpowell.com).
 
 ##  Quick Start
 
